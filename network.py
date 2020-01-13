@@ -6,7 +6,15 @@ import socket
 import sys
 
 class Client(object):
-    pass
+
+    def __init__(self, address):
+
+        self.socket = self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        # Make the connection
+        self.socket.connect((address, 5000))
+        
 
 class Server(object):
 
@@ -68,12 +76,3 @@ class Server(object):
 
         for connection in self.connections:
             connection.send('\x11' + bytes(peer_list, 'utf-8'))
-
-
-
-
-
-
-
-
-
