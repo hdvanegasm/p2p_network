@@ -10,6 +10,9 @@ def app():
                         message = input()
                         if message == 'cmd_show_peers':
                             client.send_message('cmd_show_peers')
+                        elif message == 'cmd_quit':
+                            client.send_message('cmd_quit')
+                            client.send_disconnect_signal()
                         else:
                             client.send_message(message)
                 except KeyboardInterrupt:

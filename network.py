@@ -19,7 +19,7 @@ class Client(object):
 
         # Make the connection
         self.socket.connect((address, 5000))
-        self.bytesize = 1024
+        self.byte_size = 1024
 
         print('==> Connected to server.')
 
@@ -37,18 +37,18 @@ class Client(object):
 
     def receive_message(self):
         try:
-            data = self.socket.recv(self.bytesize)
+            data = self.socket.recv(self.byte_size)
             return data.decode('utf-8')
         except KeyboardInterrupt:
             self.send_disconnect_signal()
 
     def send_disconnect_signal(self):
-        print('==> Disconected from server.')
+        print('==> Disconnected from server.')
         self.socket.send("q".encode('utf-8'))
         sys.exit()
 
-    def update_peers(self, peers):
-        P2PNetwork.peers = str(peers, 'utf-8').split(',')[:-1]
+    def update_peers(self, peers_string):
+        P2PNetwork.peers = peers_string.split(',')[:-1]
 
     def client_listener(self):
         while True:
@@ -57,13 +57,14 @@ class Client(object):
                 if not data:
                     print("==> Server disconnected.")
                     break
-                elif data[0:1] == b'\x11':
+                elif data[0:1] == '\x11':
                     print('==> Got peers.')
                     self.update_peers(data[1:])
                 else:
                     print("[#] " + data)
-            except ConnectionError:
+            except ConnectionError as error:
                 print("==> Server disconnected.")
+                print('\t--' + str(error))
                 break
 
 
@@ -104,6 +105,8 @@ class Server(object):
                         return
                     elif data.decode('utf-8') == 'cmd_show_peers':
                         connection.send(('---' + str(self.peers)).encode('utf-8'))
+                    elif data.decode('utf-8') == 'cmd_quit':
+                        self.disconnect(connection, ip_port_tuple)
                     elif data:
                         connection.send(data)
         except Exception as exception:
@@ -115,7 +118,7 @@ class Server(object):
         self.peers.remove(ip_port_tuple)
         connection.close()
         self.send_peers()
-        print('{} disconnected.'.format(ip_port_tuple))
+        print('==> {} disconnected.'.format(ip_port_tuple))
 
     def send_peers(self):
         peer_list = ""
