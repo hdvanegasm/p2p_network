@@ -7,7 +7,6 @@ def app():
     while True:
         try:
             print("Trying to connect...")
-            time.sleep(random.randint(1, 3))
             for peer in P2PNetwork.peers:
                 try:
                     client = Client(peer)
@@ -17,7 +16,7 @@ def app():
                     pass
 
                 # If everyone try to be server
-                if random.randint(1, 3) == 1:
+                if random.randint(1, 20) == 1:
                     try:
                         server = Server(byte_size=1024)
                     except KeyboardInterrupt:

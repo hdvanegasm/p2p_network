@@ -47,6 +47,7 @@ class Client(object):
                 print('\t--' + str(error))
                 break
 
+    # TODO Correct when a peer that is not the server is disconnected
     def send_message(self):
         while True:
             message = input()
@@ -54,9 +55,8 @@ class Client(object):
                 self.socket.send(message.encode('utf-8'))
             except KeyboardInterrupt:
                 self.send_disconnect_signal()
-            except Exception as exception:
-                print(exception)
-                self.send_disconnect_signal()
+            except:
+                print("==> Connection lost with server.")
 
     def receive_message(self):
         try:
@@ -119,21 +119,16 @@ class Server(object):
                 data = connection_handler.recv(self.byte_size)
                 # Check if the peer wants to disconnect
                 for connection in self.connections:
-                    if data.decode('utf-8') == 'cmd_show_peers':
+                    if data and data.decode('utf-8') == 'cmd_show_peers':
                         connection.send(('---' + str(self.peers)).encode('utf-8'))
                     elif data:
                         connection.send(data)
-                if not data:
-                    print("==> " + str(ip_port_tuple) + " disconnected")
-                    self.connections.remove(connection_handler)
-                    connection_handler.close()
-                    self.peers.remove(ip_port_tuple)
-                    self.send_peers()
-                    break
-        except Exception as exception:
-            print(exception)
-            sys.exit()
-
+        except ConnectionResetError:
+            print("==> " + str(ip_port_tuple) + " disconnected")
+            self.connections.remove(connection_handler)
+            connection_handler.close()
+            self.peers.remove(ip_port_tuple)
+            self.send_peers()
 
     def send_peers(self):
         peer_list = ""
