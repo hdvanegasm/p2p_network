@@ -1,33 +1,29 @@
 from network import *
+import random
+import time
 
 
 def app():
     while True:
         try:
+            print("Trying to connect...")
+            time.sleep(random.randint(1, 3))
             for peer in P2PNetwork.peers:
                 try:
                     client = Client(peer)
-                    while True:
-                        message = input()
-                        if message == 'cmd_show_peers':
-                            client.send_message('cmd_show_peers')
-                        elif message == 'cmd_quit':
-                            client.send_message('cmd_quit')
-                            client.send_disconnect_signal()
-                        else:
-                            client.send_message(message)
                 except KeyboardInterrupt:
                     sys.exit(0)
-                except Exception as exception:
-                    print(exception)
+                except:
+                    pass
 
-                try:
-                    server = Server(byte_size=1024)
-                    server.run()
-                except KeyboardInterrupt:
-                    sys.exit(0)
-                except Exception as exception:
-                    print(exception)
+                # If everyone try to be server
+                if random.randint(1, 3) == 1:
+                    try:
+                        server = Server(byte_size=1024)
+                    except KeyboardInterrupt:
+                        sys.exit(0)
+                    except:
+                        print("Server is not running")
 
         except KeyboardInterrupt:
             sys.exit(0)
