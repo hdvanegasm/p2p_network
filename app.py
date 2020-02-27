@@ -1,5 +1,6 @@
 from network import *
 
+
 def app():
     while True:
         try:
@@ -21,16 +22,16 @@ def app():
                     print(exception)
 
                 try:
-                    server = Server(byte_size = 1024)
+                    server = Server(byte_size=1024)
                     server.run()
                 except KeyboardInterrupt:
                     sys.exit(0)
                 except Exception as exception:
                     print(exception)
 
-
         except KeyboardInterrupt:
             sys.exit(0)
+
 
 if __name__ == '__main__':
     app()

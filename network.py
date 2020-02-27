@@ -1,14 +1,19 @@
-'''
+"""
 This is a basic implementation of a client for a P2P network.
-'''
+"""
 
 import socket
 import sys
 import threading
 
-class P2PNetwork(object):
 
+class P2PNetwork(object):
     peers = ['127.0.0.1']
+
+
+def update_peers(peers_string):
+    P2PNetwork.peers = peers_string.split(',')[:-1]
+
 
 class Client(object):
 
@@ -23,7 +28,7 @@ class Client(object):
 
         print('==> Connected to server.')
 
-        client_listener_thread = threading.Thread(target = self.client_listener)
+        client_listener_thread = threading.Thread(target=self.client_listener)
         client_listener_thread.start()
 
     def send_message(self, message):
@@ -47,9 +52,6 @@ class Client(object):
         self.socket.send("q".encode('utf-8'))
         sys.exit()
 
-    def update_peers(self, peers_string):
-        P2PNetwork.peers = peers_string.split(',')[:-1]
-
     def client_listener(self):
         while True:
             try:
@@ -59,14 +61,13 @@ class Client(object):
                     break
                 elif data[0:1] == '\x11':
                     print('==> Got peers.')
-                    self.update_peers(data[1:])
+                    update_peers(data[1:])
                 else:
                     print("[#] " + data)
             except ConnectionError as error:
                 print("==> Server disconnected.")
                 print('\t--' + str(error))
                 break
-
 
 class Server(object):
 
@@ -141,7 +142,7 @@ class Server(object):
             self.connections.append(connection_handler)
 
             # Initialize the handler thread
-            handler_thread = threading.Thread(target = self.handler, args = (connection_handler, ip_port_tuple,))
+            handler_thread = threading.Thread(target=self.handler, args=(connection_handler, ip_port_tuple,))
             handler_thread.daemon = True
             handler_thread.start()
 
