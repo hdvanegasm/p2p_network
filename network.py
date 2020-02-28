@@ -51,12 +51,8 @@ class Client(object):
     def send_message(self):
         while True:
             message = input()
-            try:
-                self.socket.send(message.encode('utf-8'))
-            except KeyboardInterrupt:
-                self.send_disconnect_signal()
-            except:
-                print("==> Connection lost with server.")
+            message = str(self.socket.getsockname()) + " >> " + message
+            self.socket.send(message.encode('utf-8'))
 
     def receive_message(self):
         try:
